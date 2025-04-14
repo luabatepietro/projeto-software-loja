@@ -21,13 +21,13 @@ jobs:
         
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-
+      
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: "ezambomsantana"
+        username: "jpqv"
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    
+      
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     
@@ -37,7 +37,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ezambomsantana/loja-ci:${{ github.sha }}
+        tags: jpqv/loja-ci:${{ github.sha }}
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
@@ -49,4 +49,4 @@ jobs:
         script: |
           docker stop loja
           docker rm --force loja
-          docker run -d -p 8081:8081 --name loja --network=rede ezambomsantana/loja-ci:${{ github.sha }}
+          docker run -d -p 8081:8081 -e REDIS_HOST=redis -e string_conexao_MongoDB_loja=${{ secrets.string_conexao_MongoDB_loja }} --name loja --network=rede jpqv/loja-ci:${{ github.sha }}
